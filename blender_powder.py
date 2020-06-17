@@ -115,15 +115,11 @@ def getListOfFiles(dirName):
     return allFiles
 
 
-
-PATH='C:\\Users\\User\\Downloads\\DeCost-Holm_Data-in-Brief\DeCost-Holm_Data-in-Brief'
-#texture_path=PATH+'\\'+'part_texture.jpg'#params[0]
-particles_path=PATH+'\\'+'particles/'#params[1]
-renderpath=PATH+'\\''renders/'#params[2]
-#texture_pathNPs=PATH+'\\'+'metal_texture.jpg'
-texturespath=PATH+'\\'+'textures'+'\\'+'newtext'#params[0]
-
-
+# PATH TO WORKING FOLDER
+PATH=''
+particles_path=PATH+'\\'+'particles/'
+renderpath=PATH+'\\'+'renders/'
+texturespath=PATH+'\\'+'textures'+'\\'+'newtext'
 
 jsonfiles=[]
 for jsonfile in os.listdir(particles_path):
@@ -178,7 +174,7 @@ for f in os.listdir(texturespath):
 
 texturepathesall=getListOfFiles(texturespath)
               
-with open('C:\\Users\\User\\Downloads\\DeCost-Holm_Data-in-Brief\DeCost-Holm_Data-in-Brief\\annotations2.csv', 'a',newline='') as csvfile:
+with open(PATH+'\\annotations2.csv', 'a',newline='') as csvfile:
     filewriter = csv.writer(csvfile)
     timebeg=time.time()
     for ind,jsonfile in enumerate(jsonfiles):
