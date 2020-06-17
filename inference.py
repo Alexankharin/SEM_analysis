@@ -22,7 +22,10 @@ import easygui
 #import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 import csv
+import seaborn as sns
+import tensorflow
 
+tensorflow._api.v2.image.resize_images = tensorflow.image.resize
 
 def read_image_bgr(path):
     """ Read an image in BGR format.
@@ -158,28 +161,30 @@ def opentescanfile(filepath,model, sizesens,neg=False, eqhist=True):
     scale=scale*FACTOR
     return imagertoret, boxes, scores,labels, scale
 def update(val):
-    TRASHOLD=samp.val
+    TRASHOLD=probabilitySlider.val
+    MAXSIZE=maxsizeSlider.val
     draw = imager.copy()
     draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
-    for box, score, label in zip(boxes, scores, labels):
-        # scores are sorted so we can break
-        if score > TRASHOLD:     
-            color = label_color(label)
-            b = box.astype(int)
-            draw_box(draw, b, color=color,thickness=1)
+    validboxes=drawvalidboxes(boxes, scores, labels, TRASHOLD,draw,MAXSIZE)
     ax_orig.imshow(draw)
     fig.canvas.draw()
     #fig.canvas.draw_idle()
     ax_neu.clear()
     sizes=[]
-    for box, score in zip(boxes, scores):
-        if score > TRASHOLD:
-            sizes.append(np.abs(box[2]-box[0])*SCALE)
+    for box in validboxes:
+        sizes.append(np.abs(box[2]-box[0])*SCALE)
     sizes = pd.Series(sizes)   
-    sizes.hist(bins=30, ax=ax_neu)
-    textstr='mean is {} nm +- {} nm'.format(str(np.mean(sizes))[:4], str(np.std(sizes))[:4])
+    #sizes.hist(bins=30, ax=ax_neu)
+    textstr='Mean is {} nm +- {} nm \n Total {} particles'.format(str(np.mean(sizes))[:4], str(np.std(sizes))[:4], str(len(sizes)))
+    sns.distplot(sizes, hist=True, kde=True, 
+             bins=int(180/5), color = 'darkblue', 
+             hist_kws={'edgecolor':'black'},
+             kde_kws={'linewidth': 4},ax=ax_neu).set_title(textstr)
+    ax_neu.set(xlabel='size, nm', ylabel='normalized number of species')
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    ax_neu.text(0.05, 0.95, textstr, fontsize=14, verticalalignment='top',bbox=props)
+    #ax_neu.text(0.5, 0.5, textstr, horizontalalignment='center', verticalalignment='center')#, transform=ax.transAxes)
+    #ax_neu.text(textstr, fontsize=14, verticalalignment='top',bbox=props)
+    #ax_neu.text=textstr
 
 def boxselector(boxes,scores, labels):
     BSL=[(boxes[i],scores[i],labels[i]) for i in range(len(boxes))]
@@ -210,55 +215,91 @@ def save_dialog(event):
 def askforsensitivity():
     msg ="select size sensitivity (2 or 3 for small NPs)"
     title = "size sensitivity"
-    choices = [1,2,3]
+    choices = [1,2,3,4,5]
     choice = easygui.choicebox(msg, title, choices)
     return choice
 
+def drawvalidboxes(boxes, scores, labels, TRASHOLD, draw,MAXSIZE=10000000000):
+    validboxes=[]
+    for box, score, label in zip(boxes, scores, labels):
+        #DRAW VALID BOXES
+        if score > TRASHOLD and ((box[2]-box[0])*SCALE<MAXSIZE and (box[3]-box[1])*SCALE<MAXSIZE):
+            validboxes.append(box)
+            color = label_color(label)
+            b = box.astype(int)
+            draw_box(draw, b, color=color,thickness=1)
+    return validboxes
 
 
-
-model=mdls.load_model('infermodelBS4.04-1.5602-1.5906h5')
-filepath = easygui.fileopenbox()
 TRASHOLD=0.5
-choice=askforsensitivity()
+#LOAD MODEL
 
+#model=mdls.load_model('infermodelBS4.04-1.5602-1.5906h5')
+#model=mdls.load_model('infermodelBS4.02-1.2197-1.4835h5')
+model=mdls.load_model('infermodelEQOnly_BS4.05-1.1397-1.3918h5')
+
+#SELECT FILE
+def newfile_dialog(event,fig):
+	filepath = easygui.fileopenbox()
+
+	#SELECT GRID
+	choice=askforsensitivity()
+	#GET ALL BOXES
+	global imager
+	global boxes
+	global scores
+	global labels
+	global SCALE
+	global draw
+	imager, boxes, scores,labels, SCALE = opentescanfile(filepath,model,choice)
+
+	#PLOT IMAGE
+	draw = imager.copy()
+	draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
+	#SELECT AND DRAW VALID BOXES
+	color = label_color(0)
+	validoboxes=drawvalidboxes(boxes, scores, labels, TRASHOLD,draw)
+	ax_orig.imshow(draw)
+	fig.canvas.draw()
+	plt.show()
+	return 0
+
+filepath = easygui.fileopenbox()
+
+#SELECT GRID
+choice=askforsensitivity()
+#GET ALL BOXES
 imager, boxes, scores,labels, SCALE = opentescanfile(filepath,model,choice)
 
-
-
-'''
-imager, boxesN, scoresN,labelsN, SCALE = opentescanfile(filepath,model,choice,neg=True)
-imager, boxesF, scoresF,labelsF, SCALE = opentescanfile(filepath,model,choice,eqhist=False)
-imager, boxesFN, scoresFN,labelsFN, SCALE = opentescanfile(filepath,model,choice,eqhist=False,neg=True)
-
-boxes=np.concatenate([boxes,boxesN,boxesF,boxesFN],axis=0)
-scores=np.concatenate([scores,scoresN,scoresF,scoresFN],axis=0)
-labels=np.concatenate([labels,labelsN,labelsF,labelsFN],axis=0)
-
-boxes, scores, labels = boxselector(boxes,scores, labels)
-'''
+#PLOT IMAGE
 fig = plt.figure(figsize=(6, 4))
 ax_orig = fig.add_subplot(121) 
 ax_neu = fig.add_subplot(122) 
 plt.axis('off')
 draw = imager.copy()
 draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
-#print (boxes[0].shape)
-for box, score, label in zip(boxes, scores, labels):
-    # scores are sorted so we can break
-    if score > TRASHOLD: 
-        color = label_color(label)
-        b = box.astype(int)
-        draw_box(draw, b, color=color,thickness=2)
+#SELECT AND DRAW VALID BOXES
+color = label_color(0)
+validoboxes=drawvalidboxes(boxes, scores, labels, TRASHOLD,draw)
 ax_orig.imshow(draw)
-axamp = plt.axes([0.25, .03, 0.50, 0.02])
-samp = Slider(axamp, 'BBOX TRASHOLD', 0, 1, valinit=0.5)
-samp.on_changed(update)
+fig.canvas.draw()
 
-axcut = plt.axes([0.9, 0.0, 0.1, 0.075])
-bcut = Button(axcut, 'save_hist', color='red', hovercolor='green')
+probabilityax  = fig.add_axes([0.13, 0.03, 0.34, 0.02])
+probabilitySlider = Slider(probabilityax, 'BBOX TRASHOLD', 0, 1, valinit=0.5)
+probabilitySlider.on_changed(update)
+
+maxsizeax = fig.add_axes([0.13, 0.01, 0.34, 0.02])
+maxsizeSlider = Slider(maxsizeax, 'MaxSize', 0, SCALE*imager.shape[0], valinit=SCALE*imager.shape[0]/2)
+maxsizeSlider.on_changed(update)
+
+axcut = plt.axes([0.88, 0.02, 0.1, 0.04])
+bcut = Button(axcut, 'save_hist', color='violet', hovercolor='green')
 bcut.on_clicked(save_dialog)
-
+axcut2 = plt.axes([0.76, 0.02, 0.1, 0.04])
+bcut2 = Button(axcut2, 'open new file', color='violet', hovercolor='green')
+bcut2.on_clicked(lambda x: newfile_dialog(x,fig))
 plt.show()
+
+#plt.connect('button_press_event', on_click)
 
 #plt.connect('button_press_event', on_click)
