@@ -24,3 +24,10 @@ Place it to the same folder as inference.py script and run
 
 
 python inference.py
+
+
+For own dataset synthesis:
+1. place files with textures at textures folder
+2. run jupyter_NPS_generate.ipynb for json files generation (contains random particles coordinates and sizes)
+3. run blender_powder.py into blender enviroment
+4. It will generate annotations.csv and images at directory "renders"
