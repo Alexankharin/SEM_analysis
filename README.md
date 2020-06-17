@@ -27,10 +27,10 @@ python inference.py
 
 
 For own dataset synthesis:
-1. place files with textures at textures folder
-2. run jupyter_NPS_generate.ipynb for json files generation (contains random particles coordinates and sizes)
+1. place files with your to textures folder
+2. run jupyter_NPS_generate.ipynb for JSON files generation (generated JSON contains particles positions and sizes)
 3. run blender_powder.py into blender enviroment
-4. It will generate annotations.csv and images at directory "renders"
+4. It will generate annotations.csv file with all labels and images at directory "renders"
 
-Detailed trainig procedure can be found at https://www.kaggle.com/alexanderkhar/nps-detector
-Generated dataset is at https://www.kaggle.com/alexanderkhar/generated-nps
+Detailed RetinaNet trainig procedure can be found at https://www.kaggle.com/alexanderkhar/nps-detector
+Example of generated dataset can be found at https://www.kaggle.com/alexanderkhar/generated-nps
