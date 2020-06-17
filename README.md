@@ -31,3 +31,6 @@ For own dataset synthesis:
 2. run jupyter_NPS_generate.ipynb for json files generation (contains random particles coordinates and sizes)
 3. run blender_powder.py into blender enviroment
 4. It will generate annotations.csv and images at directory "renders"
+
+Detailed trainig procedure can be found at https://www.kaggle.com/alexanderkhar/nps-detector
+Generated dataset is at https://www.kaggle.com/alexanderkhar/generated-nps
