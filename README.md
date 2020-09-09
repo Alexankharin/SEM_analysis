@@ -16,6 +16,12 @@ Anaconda distributive recommended since it contains most of packages preinstalle
 packages can be installed via command 
 
 pip install packagename
+How to install:
+install Anaconda (https://anaconda.org/)
+install tensorflow and keras-retinanet via anaconda prompt (
+pip install tensorflow
+pip install keras-retinanet
+)
 
 # SEM_analysis
 SEM_analysis neural network
