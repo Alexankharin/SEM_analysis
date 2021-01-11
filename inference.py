@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import keras
 import matplotlib
 import matplotlib.image as img
 import matplotlib.patches as patches
@@ -18,14 +17,11 @@ from keras_retinanet.utils.colors import label_color
 import cv2
 from matplotlib.widgets import Slider
 import easygui
-#import numpy as np
-#import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 import csv
 import seaborn as sns
 import tensorflow
-
-tensorflow._api.v2.image.resize_images = tensorflow.image.resize
+import tensorflow.keras as keras
 
 def read_image_bgr(path):
     """ Read an image in BGR format.
@@ -161,6 +157,7 @@ def opentescanfile(filepath,model, sizesens,neg=False, eqhist=True):
     scale=scale*FACTOR
     return imagertoret, boxes, scores,labels, scale
 def update(val):
+    global validboxes
     TRASHOLD=probabilitySlider.val
     MAXSIZE=maxsizeSlider.val
     draw = imager.copy()
@@ -200,14 +197,18 @@ def boxselector(boxes,scores, labels):
 
 def save_dialog(event):
     sizes=[]
+    tosave=[]
     savepath=easygui.filesavebox(msg='select filename', title='save', default='test', filetypes='csv')
     if savepath[-4:]!='.csv':
         savepath=savepath+'.csv'
-    for box, score in zip(boxes, scores):
-        if score > TRASHOLD:
-            sizes.append(np.abs(box[2]-box[0])*SCALE)
+    for box in boxes:
+        #if score > TRASHOLD:
+        sizes.append(np.abs(box[2]-box[0])*SCALE)
+        tosave.append(np.array((box[0],box[1],box[2],box[3])))
     sizes = np.array(sizes)
+    tosave=np.array(tosave)
     np.savetxt(savepath, sizes, delimiter=",",header='diameter')
+    np.savetxt(savepath+'_boxes.csv', tosave, delimiter=",")
     #print (sizes)
     #pd.DataFrame(np_array).to_csv(savepath)
     return 0
@@ -232,10 +233,7 @@ def drawvalidboxes(boxes, scores, labels, TRASHOLD, draw,MAXSIZE=10000000000):
 
 
 TRASHOLD=0.5
-#LOAD MODEL
-
-#model=mdls.load_model('infermodelBS4.04-1.5602-1.5906h5')
-#model=mdls.load_model('infermodelBS4.02-1.2197-1.4835h5')
+validboxes=[]
 model=mdls.load_model('infermodelEQOnly_BS4.05-1.1397-1.3918h5')
 
 #SELECT FILE

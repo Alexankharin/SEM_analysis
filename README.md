@@ -16,12 +16,6 @@ Anaconda distributive recommended since it contains most of packages preinstalle
 packages can be installed via command 
 
 pip install packagename
-How to install:
-install Anaconda (https://anaconda.org/)
-install tensorflow and keras-retinanet via anaconda prompt (
-pip install tensorflow
-pip install keras-retinanet
-)
 
 # SEM_analysis
 SEM_analysis neural network
@@ -33,7 +27,7 @@ python inference.py
 
 
 For own dataset synthesis:
-1. place files with your textures to textures folder
+1. place files with your to textures folder
 2. run jupyter_NPS_generate.ipynb for JSON files generation (generated JSON contains particles positions and sizes)
 3. run blender_powder.py into blender enviroment
 4. It will generate annotations.csv file with all labels and images at directory "renders"
