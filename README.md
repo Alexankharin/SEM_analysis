@@ -16,7 +16,7 @@ Anaconda distributive recommended since it contains most of packages preinstalle
 packages can be installed via command 
 
 pip install packagename
-windows executable produced by pyinstaller can be downloaded here http://friendgame.byethost24.com/js/SEM_analysis/inference.zip
+windows executable produced by pyinstaller can be downloaded here http://friendgame.byethost24.com/js/SEM_analysis/SEM_analysis.zip
 
 # SEM_analysis
 SEM_analysis neural network
