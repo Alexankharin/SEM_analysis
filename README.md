@@ -21,7 +21,7 @@ windows executable produced by pyinstaller can be downloaded here http://friendg
 
 Colab version can be used from here
 
-https://colab.research.google.com/drive/1wQAnWgIyhI-VEGI0y22R1cuPIhNGmMVH#scrollTo=59anwhgFaa1W
+https://colab.research.google.com/drive/1wQAnWgIyhI-VEGI0y22R1cuPIhNGmMVH?usp=sharing
 
 
 # SEM_analysis
