@@ -16,7 +16,13 @@ Anaconda distributive recommended since it contains most of packages preinstalle
 packages can be installed via command 
 
 pip install packagename
+
 windows executable produced by pyinstaller can be downloaded here http://friendgame.byethost24.com/js/SEM_analysis/SEM_analysis.zip
+
+Colab version can be used from here
+
+https://colab.research.google.com/drive/1wQAnWgIyhI-VEGI0y22R1cuPIhNGmMVH#scrollTo=59anwhgFaa1W
+
 
 # SEM_analysis
 SEM_analysis neural network
